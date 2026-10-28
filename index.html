@@ -1,0 +1,771 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>ヘルプマークを考える</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@600;700;900&display=swap">
+<style>
+/* Layout: 1カラムの読み物。合図（赤いタグ）→伝わり（点線）→受け手、を全図の共通モチーフにする */
+:root{
+  --bg:#F6F1E7; --surface:#FFFDF8; --surface2:#EFE8DA; --ink:#1B2A38; --muted:#56626D; --line:#DDD3C1;
+  --teal:#1E6E66; --teal-soft:#DCEBE7; --amber:#9A6421; --amber-soft:#F3E4CC; --rust:#9C4A3C; --rust-soft:#F3DCD6;
+  --signal:#C8323A; --on-signal:#FFFFFF;
+  --f-display:"Noto Serif JP","Hiragino Mincho ProN","Yu Mincho",serif;
+  --f-body:"Noto Sans JP","Hiragino Sans","Yu Gothic",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#131B23; --surface:#1B2631; --surface2:#22303C; --ink:#ECE6DA; --muted:#A7B1BA; --line:#33424F;
+  --teal:#6BBDB1; --teal-soft:#1D3835; --amber:#E0AE68; --amber-soft:#3A2E1D; --rust:#E08D7A; --rust-soft:#3D2620;
+  --signal:#E4545B; --on-signal:#FFFFFF; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#131B23; --surface:#1B2631; --surface2:#22303C; --ink:#ECE6DA; --muted:#A7B1BA; --line:#33424F;
+  --teal:#6BBDB1; --teal-soft:#1D3835; --amber:#E0AE68; --amber-soft:#3A2E1D; --rust:#E08D7A; --rust-soft:#3D2620;
+  --signal:#E4545B; --on-signal:#FFFFFF; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.85;letter-spacing:.01em;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+a{color:var(--teal);text-underline-offset:3px}
+a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible{outline:3px solid var(--amber);outline-offset:2px;border-radius:4px}
+.wrap{max-width:760px;margin:0 auto}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.4;margin:0}
+h2{font-size:clamp(1.5rem,4.2vw,2rem);font-weight:700}
+h3{font-size:1.15rem;font-weight:700}
+p{margin:0}
+.stack{display:flex;flex-direction:column;gap:18px}
+.muted{color:var(--muted)}
+small,.small{font-size:.86rem}
+
+/* header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--surface);border-bottom:1px solid var(--line);margin-left:calc(-1*max(16px,env(safe-area-inset-left,0px)));margin-right:calc(-1*max(16px,env(safe-area-inset-right,0px)));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.top-in{max-width:760px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px;height:48px}
+.top-title{font-family:var(--f-display);font-weight:700;font-size:.95rem;display:flex;align-items:center;gap:8px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tag-dot{width:10px;height:14px;border-radius:3px;background:var(--signal);flex:none}
+.toc-btn{font:inherit;font-size:.85rem;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:4px 14px;cursor:pointer;display:flex;align-items:center;gap:6px;flex:none}
+.progress{height:3px;background:var(--line)}
+.progress span{display:block;height:100%;width:0;background:var(--teal)}
+.toc{position:absolute;right:max(16px,env(safe-area-inset-right,0px));top:52px;width:min(320px,calc(100vw - 32px));background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.15);padding:8px;max-height:60vh;overflow:auto}
+.toc button{display:block;width:100%;text-align:left;font:inherit;font-size:.88rem;line-height:1.5;background:none;border:0;color:var(--ink);padding:7px 10px;border-radius:6px;cursor:pointer}
+.toc button:hover{background:var(--surface2)}
+.toc b{color:var(--muted);font-weight:500;margin-right:8px;font-variant-numeric:tabular-nums}
+
+/* hero */
+.hero{padding-block:48px 28px}
+.eyebrow{font-size:.78rem;letter-spacing:.14em;color:var(--teal);font-weight:700}
+.hero h1{font-size:clamp(2.1rem,7vw,3.2rem);font-weight:900;margin-top:10px;letter-spacing:.02em}
+.hero .lead{font-size:1.08rem;margin-top:18px;max-width:40em}
+.hero-fig{margin-top:28px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;overflow-x:auto}
+.hero-fig svg{display:block;width:100%;min-width:520px;height:auto}
+.legend{display:flex;flex-wrap:wrap;gap:10px 18px;margin-top:18px;font-size:.85rem;color:var(--muted);align-items:center}
+
+/* badges */
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:.74rem;font-weight:700;border-radius:999px;padding:1px 10px;line-height:1.7;white-space:nowrap;vertical-align:2px;font-family:var(--f-body)}
+.b-hi{background:var(--teal-soft);color:var(--teal)}
+.b-mid{background:var(--amber-soft);color:var(--amber)}
+.b-lo{background:var(--rust-soft);color:var(--rust)}
+.b-view{background:var(--surface2);color:var(--ink);border:1px dashed var(--muted)}
+
+/* sections */
+section.sec{padding-block:56px 8px;scroll-margin-top:64px}
+.sec-head{display:flex;flex-direction:column;gap:6px;margin-bottom:22px}
+.sec-no{font-size:.8rem;letter-spacing:.12em;color:var(--muted);font-weight:700;font-variant-numeric:tabular-nums}
+.bridge{border-left:3px solid var(--teal);padding:4px 0 4px 14px;color:var(--muted);font-size:.92rem}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+.callout{background:var(--teal-soft);border-radius:12px;padding:16px 18px}
+.callout.warn{background:var(--rust-soft)}
+.callout.warn strong{color:var(--rust)}
+.callout strong{color:var(--teal)}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media (max-width:640px){.grid2,.grid3{grid-template-columns:1fr}}
+.ico{width:28px;height:28px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.ico-row{display:flex;gap:12px;align-items:flex-start}
+.ico-row > div{min-width:0}
+.label{font-size:.75rem;letter-spacing:.1em;font-weight:700;color:var(--muted)}
+ul.clean{margin:0;padding-left:1.2em}
+ul.clean li+li{margin-top:6px}
+
+/* visible vs invisible */
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.vs > div{padding:18px;min-width:0}
+.vs > div:first-child{background:var(--surface)}
+.vs > div:last-child{background:var(--rust-soft)}
+@media (max-width:560px){.vs{grid-template-columns:1fr}}
+
+/* facts */
+.fact dt{font-size:.78rem;letter-spacing:.08em;font-weight:700;color:var(--teal)}
+.fact dd{margin:2px 0 0}
+.fact{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 22px;margin:0}
+@media (max-width:560px){.fact{grid-template-columns:1fr}}
+
+/* timeline */
+.tl{list-style:none;margin:0;padding:0;position:relative}
+.tl::before{content:"";position:absolute;left:68px;top:6px;bottom:6px;width:2px;background:var(--line)}
+.tl li{display:grid;grid-template-columns:56px 1fr;gap:26px;padding-block:8px;position:relative}
+.tl li::after{content:"";position:absolute;left:63px;top:17px;width:12px;height:12px;border-radius:50%;background:var(--surface);border:2px solid var(--teal)}
+.tl li.hot::after{background:var(--signal);border-color:var(--signal)}
+.tl time{font-weight:700;font-variant-numeric:tabular-nums;color:var(--teal);text-align:right;font-size:.95rem}
+.tl li > div{min-width:0}
+
+/* table */
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px}
+table{border-collapse:collapse;width:100%;min-width:520px;background:var(--surface);font-size:.92rem}
+th,td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{background:var(--surface2);font-weight:700}
+tr:last-child td{border-bottom:0}
+
+/* steps */
+.steps{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+@media (max-width:640px){.steps{grid-template-columns:1fr}}
+.step{font:inherit;text-align:left;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:12px;cursor:pointer;display:flex;flex-direction:column;gap:6px;min-width:0}
+.step[aria-pressed="true"]{border-color:var(--teal);box-shadow:inset 0 0 0 1px var(--teal)}
+.step .n{font-size:.75rem;color:var(--muted);font-weight:700;font-variant-numeric:tabular-nums}
+.step .t{font-weight:700;line-height:1.45}
+.meter{display:flex;gap:3px}
+.meter i{flex:1;height:6px;border-radius:3px;background:var(--line)}
+.meter i.on{background:var(--signal)}
+.step-detail{margin-top:12px}
+
+/* chart */
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px;background:var(--surface2)}
+.seg button{font:inherit;font-size:.85rem;border:0;background:none;color:var(--muted);padding:4px 14px;border-radius:999px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);font-weight:700;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.bars{display:flex;flex-direction:column;gap:9px;margin-top:16px}
+.bar{display:grid;grid-template-columns:7.5em 1fr 3.4em;gap:10px;align-items:center;font-size:.9rem}
+.bar .track{height:16px;background:var(--surface2);border-radius:4px;position:relative;overflow:hidden}
+.bar .fill{position:absolute;inset:0 auto 0 0;background:var(--teal);border-radius:4px;transition:width .5s ease}
+.bar.total .fill{background:var(--ink)}
+.bar .v{font-variant-numeric:tabular-nums;text-align:right;font-weight:700}
+.axis{display:grid;grid-template-columns:7.5em 1fr 3.4em;gap:10px;font-size:.72rem;color:var(--muted)}
+.axis div{display:flex;justify-content:space-between;font-variant-numeric:tabular-nums}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+@media (max-width:640px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;min-width:0}
+.stat .num{font-family:var(--f-display);font-size:1.9rem;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.2}
+.stat .num small{font-size:.9rem}
+.stat .cap{font-size:.82rem;color:var(--muted);line-height:1.5}
+.stat.alert .num{color:var(--rust)}
+
+/* slider */
+.sim{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px}
+.sim input[type=range]{width:100%;accent-color:var(--teal);margin-top:6px}
+.ticks{display:grid;grid-template-columns:repeat(3,1fr);font-size:.78rem;color:var(--muted);margin-top:2px}
+.ticks span:nth-child(2){text-align:center}.ticks span:last-child{text-align:right}
+.gauges{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 20px;margin-top:18px}
+@media (max-width:560px){.gauges{grid-template-columns:1fr}}
+.gauge .gl{font-size:.88rem;font-weight:700;display:flex;justify-content:space-between;gap:8px}
+.gauge .gt{height:10px;background:var(--surface2);border-radius:5px;margin-top:5px;overflow:hidden}
+.gauge .gf{height:100%;border-radius:5px;transition:width .4s ease}
+.gf.r{background:var(--rust)}.gf.a{background:var(--amber)}
+.sim-out{margin-top:16px;border-top:1px solid var(--line);padding-top:14px}
+
+/* loop */
+.loop-fig{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;overflow-x:auto}
+.loop-fig svg{display:block;width:100%;min-width:560px;height:auto}
+
+/* details */
+details.acc{background:var(--surface);border:1px solid var(--line);border-radius:12px}
+details.acc + details.acc{margin-top:10px}
+details.acc summary{cursor:pointer;list-style:none;padding:14px 44px 14px 18px;font-weight:700;position:relative;line-height:1.5}
+details.acc summary::-webkit-details-marker{display:none}
+details.acc summary::after{content:"";position:absolute;right:18px;top:50%;width:9px;height:9px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:translateY(-70%) rotate(45deg);transition:transform .2s}
+details.acc[open] summary::after{transform:translateY(-30%) rotate(-135deg)}
+details.acc .body{padding:0 18px 16px;display:flex;flex-direction:column;gap:10px}
+.sum-sub{display:block;font-weight:400;font-size:.85rem;color:var(--muted);margin-top:2px}
+.pc{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:560px){.pc{grid-template-columns:1fr}}
+.pc > div{border-radius:8px;padding:10px 12px;font-size:.92rem;min-width:0}
+.pc .pro{background:var(--teal-soft)}.pc .con{background:var(--rust-soft)}
+.pc .label{display:block;margin-bottom:4px}
+
+.two-side{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:640px){.two-side{grid-template-columns:1fr}}
+.side{border-radius:12px;padding:18px;min-width:0}
+.side.a{background:var(--amber-soft)}.side.b{background:var(--teal-soft)}
+.side h3{margin-bottom:10px}
+
+.role{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:560px){.role{grid-template-columns:1fr}}
+.role > div{border-radius:12px;padding:16px;border:1px solid var(--line);background:var(--surface);min-width:0}
+.role > div.refer{border-color:var(--rust)}
+.qlist{counter-reset:q;list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px}
+.qlist li{counter-increment:q;display:grid;grid-template-columns:2em 1fr;gap:8px}
+.qlist li::before{content:"Q" counter(q);font-weight:700;color:var(--amber);font-variant-numeric:tabular-nums}
+
+.action{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:560px){.action{grid-template-columns:1fr}}
+
+.sources ol{padding-left:1.4em;margin:0;display:flex;flex-direction:column;gap:8px;font-size:.9rem}
+.sources a{word-break:break-all}
+footer{padding-block:48px 64px;color:var(--muted);font-size:.85rem;text-align:center}
+
+.rise{animation:rise .6s ease both}
+@keyframes rise{from{transform:translateY(10px);opacity:.55}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.rise{animation:none}.bar .fill,.gauge .gf{transition:none}}
+</style>
+
+<header class="top" id="top">
+  <div class="top-in">
+    <div class="top-title"><span class="tag-dot" aria-hidden="true"></span>ヘルプマークを考える</div>
+    <button class="toc-btn" id="tocBtn" aria-expanded="false" aria-controls="toc">
+      <svg class="ico" style="width:16px;height:16px" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>目次
+    </button>
+  </div>
+  <div class="progress" aria-hidden="true"><span id="bar"></span></div>
+  <nav class="toc" id="toc" hidden aria-label="目次">
+    <button data-target="s1"><b>01</b>なぜ必要なのか</button>
+    <button data-target="s2"><b>02</b>ヘルプマークとは</button>
+    <button data-target="s3"><b>03</b>どう働くのか</button>
+    <button data-target="s4"><b>04</b>データで見る現状</button>
+    <button data-target="s5"><b>05</b>2026年の「カジュアル化」議論</button>
+    <button data-target="s6"><b>06</b>考えるための枠組み</button>
+    <button data-target="s7"><b>07</b>論点の両面</button>
+    <button data-target="s8"><b>08</b>選択肢のメニュー</button>
+    <button data-target="s9"><b>09</b>記事をどう読むか</button>
+    <button data-target="s10"><b>10</b>就労支援の現場で</button>
+    <button data-target="s11"><b>11</b>見かけたとき・持つとき</button>
+    <button data-target="src"><b>&nbsp;&nbsp;</b>情報ソース</button>
+  </nav>
+</header>
+
+<main class="wrap">
+
+<!-- HERO -->
+<div class="hero">
+  <div class="eyebrow">スタッフ向け 実践リファレンス ／ 障害と社会のしくみ</div>
+  <h1>ヘルプマークを考える</h1>
+  <p class="lead">カバンに下がった赤いタグは、「見た目では分からないけれど、助けが要るかもしれない」と周りに伝える<strong>合図</strong>です。誰でも無料・自己申告で受け取れるこの仕組みは、強みと弱みを同じところに抱えています。2026年春に起きた「カジュアル化」の議論を手がかりに、仕組み・データ・論点・支援現場での考え方を整理します。</p>
+
+  <div class="hero-fig" role="img" aria-label="合図の流れの図。左に赤いタグを付けた人、中央に点線で伝わる合図、右に受け取る周囲の人。合図が伝えるのは『配慮が要るかもしれない』という事実だけで、何を手伝えばよいかは伝わらない。">
+    <svg viewBox="0 0 640 210" xmlns="http://www.w3.org/2000/svg">
+      <g fill="none" stroke="var(--ink)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="90" cy="54" r="20"/>
+        <path d="M58 150v-38a32 32 0 0 1 64 0v38"/>
+        <rect x="112" y="108" width="34" height="28" rx="6"/>
+      </g>
+      <path d="M129 136v8" stroke="var(--ink)" stroke-width="2"/>
+      <rect x="117" y="144" width="24" height="34" rx="5" fill="var(--signal)"/>
+      <circle cx="129" cy="150" r="2.4" fill="var(--on-signal)"/>
+      <text x="90" y="200" text-anchor="middle" font-size="13" fill="var(--muted)" font-family="Noto Sans JP, sans-serif">合図を出す人</text>
+      <g stroke="var(--signal)" stroke-width="2.5" stroke-dasharray="2 9" stroke-linecap="round" fill="none">
+        <path d="M165 150 C 260 80, 360 80, 455 110"/>
+      </g>
+      <g font-family="Noto Sans JP, sans-serif">
+        <rect x="236" y="34" width="168" height="36" rx="18" fill="var(--teal-soft)"/>
+        <text x="320" y="57" text-anchor="middle" font-size="13" fill="var(--teal)" font-weight="700">伝わる：配慮が要るかも</text>
+        <rect x="236" y="150" width="168" height="36" rx="18" fill="var(--rust-soft)"/>
+        <text x="320" y="173" text-anchor="middle" font-size="13" fill="var(--rust)" font-weight="700">伝わらない：何をすれば？</text>
+      </g>
+      <g fill="none" stroke="var(--ink)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="540" cy="54" r="20"/>
+        <path d="M508 150v-38a32 32 0 0 1 64 0v38"/>
+        <path d="M478 110c10-12 22-12 32 0" />
+      </g>
+      <text x="540" y="200" text-anchor="middle" font-size="13" fill="var(--muted)" font-family="Noto Sans JP, sans-serif">受け取る周囲の人</text>
+    </svg>
+  </div>
+  <p class="small muted" style="margin-top:8px">図中の赤いタグはイメージです。実物（赤地に白い十字とハート）のデザインは<a href="https://www.fukushi.metro.tokyo.lg.jp/shougai/shougai_shisaku/helpmark" target="_blank" rel="noopener">東京都福祉局のページ</a>で確認できます。</p>
+
+  <div class="legend">
+    <span>根拠の確かさ：</span>
+    <span class="badge b-hi">確度 高</span>公的資料・大規模調査
+    <span class="badge b-mid">確度 中</span>小規模調査・理論的整理
+    <span class="badge b-lo">確度 低</span>報道・体験談
+    <span class="badge b-view">本図解の見解</span>
+  </div>
+</div>
+
+<!-- 1 -->
+<section class="sec" id="s1">
+  <div class="sec-head"><span class="sec-no">01 ／ 問題</span><h2>なぜ必要なのか：見えない困難と「健康そうなのに」</h2></div>
+  <div class="stack">
+    <p>車いすや白杖を使っている人は、見ただけで周りが状況に気づけます。一方で、人工関節、心臓や腎臓などの病気、難病、妊娠初期の人などは、立っているのがつらくても外見からは分かりません。困りごとを知っているのは本人だけで、周りには情報がない。これが出発点です。</p>
+    <div class="vs">
+      <div>
+        <div class="ico-row"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+        <div><h3>外見から分かる困難</h3><p class="small muted" style="margin-top:6px">車いす、白杖、松葉づえ など</p><p style="margin-top:8px">周りが自分で気づき、手助けの判断ができる。</p></div></div>
+      </div>
+      <div>
+        <div class="ico-row" style="color:var(--rust)"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 5.1A10 10 0 0 1 12 5c6.5 0 10 7 10 7a17 17 0 0 1-3.2 4.2M6.6 6.6A17 17 0 0 0 2 12s3.5 7 10 7a9.8 9.8 0 0 0 5.4-1.6"/></svg>
+        <div style="color:var(--ink)"><h3>外見から分からない困難</h3><p class="small muted" style="margin-top:6px">義足・人工関節、内部障害、難病、妊娠初期、精神障害や発達障害の一部 など</p><p style="margin-top:8px">周りは気づけない。優先席に座ると「健康そうなのに」と見られることがある。</p></div></div>
+      </div>
+    </div>
+    <p><strong>内部障害</strong>とは、体の内側の臓器の働きに障害があることを指し、心臓、じん臓、呼吸器、ぼうこう・直腸、小腸、肝臓、免疫の機能障害が含まれます。見た目では分からないうえ、疲れやすさや同じ姿勢を続けにくいといった困難があります。<span class="badge b-hi">確度 高</span></p>
+    <div class="callout"><strong>誕生のきっかけ</strong>　人工関節を使っている東京都議会議員が、「助けが必要でも外見から分からない人が、優先席で冷たい目で見られている」と都議会で提案したことが、マーク作成につながったと報じられています。<span class="badge b-mid">確度 中</span></div>
+    <p class="bridge">問題は「困りごとが目に見えないこと」でした。では、それを目に見える形にする道具は、どのように設計されているのでしょうか。</p>
+  </div>
+</section>
+
+<!-- 2 -->
+<section class="sec" id="s2">
+  <div class="sec-head"><span class="sec-no">02 ／ 事実</span><h2>ヘルプマークとは</h2></div>
+  <div class="stack">
+    <div class="card">
+      <dl class="fact">
+        <div><dt>なにか</dt><dd>外見から分からなくても援助や配慮が必要な人が、そのことを周りに知らせるためのマーク。東京都が作成。</dd></div>
+        <div><dt>だれが使えるか</dt><dd>例示は義足・人工関節、内部障害、難病、妊娠初期など。例示に限らず、援助や配慮が必要な人。</dd></div>
+        <div><dt>どう手に入れるか</dt><dd><strong>本人または代理人の申し出だけ</strong>で無料配布。障害者手帳や本人確認書類、申請書は不要。原則一人一つ。</dd></div>
+        <div><dt>どう使うか</dt><dd>ストラップでカバンなどに付ける。裏面に、伝えたいことや必要な支援を書いたシールを貼れる（記入は任意）。</dd></div>
+      </dl>
+      <p class="small muted" style="margin-top:14px">配布条件は横浜市・埼玉県などの公式ページで確認。自治体によって配布窓口や付属物は異なります。<span class="badge b-hi">確度 高</span></p>
+    </div>
+
+    <div class="callout warn"><strong>設計上のいちばん大事な点</strong>　ヘルプマークは「確認しない合図」として作られています。診断名や手帳の有無で線を引かず、必要だと感じた本人の申し出を信頼する仕組みです。このあと見ていく議論は、ほぼすべてこの設計から生まれています。</div>
+
+    <h3>広がってきた経緯</h3>
+    <ol class="tl">
+      <li><time>2012</time><div>10月、都営大江戸線の各駅で配布開始。優先席にステッカーを表示。<span class="badge b-hi">確度 高</span></div></li>
+      <li><time>2013</time><div>全都営地下鉄、都営バス、都電、日暮里・舎人ライナーへ拡大（その後、ゆりかもめ、多摩モノレール、都立病院へ）。</div></li>
+      <li><time>2017</time><div>7月20日、案内用図記号の国内規格（JIS Z8210）に追加され、全国共通のマークに。訪日客にも分かる案内表示を整える東京2020大会に向けた改正の一部。</div></li>
+      <li><time>2021</time><div>10月までに全都道府県で導入。</div></li>
+      <li><time>2025</time><div>東京都の資料で、3月末時点の累計配布数は約71万個。7月20日を「ヘルプマークの日」に制定。大阪府は万博期間中、来阪外国人向けにも配布。</div></li>
+      <li class="hot"><time>2026</time><div>4月頃、若者のファッション感覚の着用などが報じられ、運用の厳格化をめぐる議論に（05で詳述）。</div></li>
+    </ol>
+
+    <h3>似た道具との違い</h3>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:22%">道具</th><th>伝える相手と場面</th><th>伝える中身</th></tr></thead>
+        <tbody>
+          <tr><td><strong>ヘルプマーク</strong></td><td>不特定の周囲の人。電車・駅・店・災害時</td><td>「配慮が要るかもしれない」という事実だけ（裏面シールで補足は可能）</td></tr>
+          <tr><td><strong>ヘルプカード</strong></td><td>困ったときに見せる相手。緊急時や日常の困りごと</td><td>緊急連絡先や必要な支援を書き込む。自治体ごとに様式がある</td></tr>
+          <tr><td><strong>ヘルプシール</strong>（葛飾区など）</td><td>パスケースや持ち物で、さりげなく</td><td>「外見からは分からない障害があります」など、より具体的な内容</td></tr>
+          <tr><td><strong>障害者手帳</strong></td><td>行政・事業所・交通機関の窓口</td><td>公的な認定。サービスや割引の資格を証明する</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="small muted">ヘルプマークは「資格の証明」ではなく「お願いの合図」です。手帳とは役割が違う点を押さえておくと、後の議論が整理しやすくなります。</p>
+    <p class="bridge">マークは「配慮が要るかもしれない」という一点だけを伝えます。では、それを見た人の中で、実際に何が起きるのでしょうか。</p>
+  </div>
+</section>
+
+<!-- 3 -->
+<section class="sec" id="s3">
+  <div class="sec-head"><span class="sec-no">03 ／ 仕組み</span><h2>どう働くのか：助けが起きるまでの5段階</h2></div>
+  <div class="stack">
+    <p>社会心理学では、居合わせた人が誰かを助けるまでに、いくつかの関門を越える必要があると考えられています。ラタネとダーリーは、助ける行動を次の5段階に分けて説明しました。どこか一つでも止まると、助けは起きません。<span class="badge b-mid">確度 中</span></p>
+    <p class="small muted">各段階をタップすると、ヘルプマークがその段階にどれだけ効くか（本図解による整理）が表示されます。赤い目盛りが多いほど効き目が大きいことを表します。</p>
+
+    <div class="steps" role="group" aria-label="援助の5段階">
+      <button class="step" data-step="0" aria-pressed="true"><span class="n">段階 1</span><span class="t">気づく</span><span class="meter"><i class="on"></i><i class="on"></i><i class="on"></i></span></button>
+      <button class="step" data-step="1" aria-pressed="false"><span class="n">段階 2</span><span class="t">助けが要る状況だと解釈する</span><span class="meter"><i class="on"></i><i class="on"></i><i class="on"></i></span></button>
+      <button class="step" data-step="2" aria-pressed="false"><span class="n">段階 3</span><span class="t">自分が動くと引き受ける</span><span class="meter"><i class="on"></i><i></i><i></i></span></button>
+      <button class="step" data-step="3" aria-pressed="false"><span class="n">段階 4</span><span class="t">どう助けるか分かる</span><span class="meter"><i class="on"></i><i></i><i></i></span></button>
+      <button class="step" data-step="4" aria-pressed="false"><span class="n">段階 5</span><span class="t">実際に行動する</span><span class="meter"><i></i><i></i><i></i></span></button>
+    </div>
+    <div class="card step-detail" id="stepDetail" aria-live="polite"></div>
+
+    <div class="callout"><strong>ここから分かること</strong>　ヘルプマークは主に段階1と2、つまり「気づかせる」「助けが要るかもと思わせる」ための道具です。段階4の「何をすればよいか」はほとんど伝えません。茨城県のネットモニターアンケートでも、マークを知っている人は8割を超えた一方、意味と対応の両方を知っている人は44.1%にとどまりました。当事者からも「どんな援助が必要なのか分からない人がいる」という声が出ています。<span class="badge b-hi">確度 高</span></div>
+
+    <h3>もう一つの仕組み：確認しない合図の強さともろさ</h3>
+    <p>経済学には、相手が知らない情報を伝えるための「合図（シグナル）」の理論があります（スペンス, 1973）。出すのに手間や費用がかかる合図ほど、偽るのが難しいので信頼されやすい、という考え方です。この見方を当てはめると、ヘルプマークの特徴が整理できます。<span class="badge b-mid">確度 中</span></p>
+    <div class="two-side">
+      <div class="side b"><h3>強み</h3><ul class="clean">
+        <li>無料・自己申告なので、手続きの壁がない</li>
+        <li>診断がつかない困難、手帳の対象外の病気、妊娠初期や一時的な不調にも使える</li>
+        <li>受け取るときに病名を誰かに説明しなくてよい</li>
+      </ul></div>
+      <div class="side a"><h3>もろさ</h3><ul class="clean">
+        <li>出す手間がないため、趣旨と違う使い方も同じように簡単</li>
+        <li>合図の信頼は「みんなが趣旨どおり使う」ことに支えられている</li>
+        <li>受け手が疑い始めると、本当に必要な人への配慮まで減りうる</li>
+      </ul></div>
+    </div>
+    <p class="bridge">仕組みの上では「気づかせる力は強いが、具体的な助けと信頼は周りに委ねられている」道具だと分かりました。実際の数字はどうでしょうか。</p>
+  </div>
+</section>
+
+<!-- 4 -->
+<section class="sec" id="s4">
+  <div class="sec-head"><span class="sec-no">04 ／ データ</span><h2>データで見る現状：知られているのに、使われにくい</h2></div>
+  <div class="stack">
+    <div class="card">
+      <div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;align-items:center">
+        <div><h3>一般の人の認知率</h3><p class="small muted">内閣府「障害者に関する世論調査」2022年（郵送、有効回収1,765人）<span class="badge b-hi">確度 高</span></p></div>
+        <div class="seg" role="group" aria-label="グラフの切り替え">
+          <button id="segAge" aria-pressed="true">年代別</button>
+          <button id="segCity" aria-pressed="false">地域の規模別</button>
+        </div>
+      </div>
+      <div class="bars" id="bars"></div>
+      <div class="axis" style="margin-top:6px"><span></span><div><span>0%</span><span>50%</span><span>100%</span></div><span></span></div>
+      <p class="small muted" style="margin-top:12px">2017年の同種調査では9.5%でした。調査方法が異なるため単純比較はできませんが、5年でかなり知られるようになったと考えられます。若い世代と東京都区部で高く、70歳以上や小さな市町村で低い傾向があります。助けを必要とすることが多い高齢層に届きにくい点は課題です。</p>
+    </div>
+
+    <h3>当事者の側から見ると</h3>
+    <p class="small muted">障害のある人を対象としたインターネット調査（ゼネラルパートナーズ障がい者総合研究所、2021年10月、164人）。同社モニターへの調査のため代表性には限界があります。<span class="badge b-mid">確度 中</span></p>
+    <div class="stats">
+      <div class="stat"><div class="num">80<small>%</small></div><div class="cap">知っている<br>（2017年は47%）</div></div>
+      <div class="stat"><div class="num">26<small>%</small></div><div class="cap">現在利用している<br>（2017年は20%）</div></div>
+      <div class="stat alert"><div class="num">25<small>%</small></div><div class="cap">想定どおり役立っている<br>（2017年は45%）</div></div>
+      <div class="stat alert"><div class="num">44<small>%</small></div><div class="cap">利用したいと思わない<br>（2017年は37%）</div></div>
+    </div>
+    <div class="card">
+      <h3>利用していない理由（複数回答）</h3>
+      <div class="bars" id="reasons"></div>
+    </div>
+    <div class="callout"><strong>読み取れること</strong>　知っている人は増えたのに、「役立っている」と感じる人は減っています。使わない理由の上位には「周りの反応が気になる」「認知不足で役に立たない」が並びます。つまり、マークの働きを左右しているのは着ける側よりも<strong>受け取る側</strong>だという見方ができます。2026年の議論が起きる前から、「嫌がらせを受けたという噂」で使うのをためらう人が増えていた点にも注意が必要です。</div>
+    <p class="bridge">こうした土台の上に、2026年春の議論が起きました。</p>
+  </div>
+</section>
+
+<!-- 5 -->
+<section class="sec" id="s5">
+  <div class="sec-head"><span class="sec-no">05 ／ 出来事</span><h2>2026年の「カジュアル化」議論</h2></div>
+  <div class="stack">
+    <p>2026年4月、10代の若者がファッション感覚や「つらさのアピール」としてヘルプマークを着けている、という報道がSNSで広がりました。Kaienの鈴木慶太氏はこれを受けて4月30日のライブ配信で問題を取り上げ、その内容が7月に記事として公開されています。</p>
+    <div class="grid2">
+      <div class="card"><div class="label">報じられたこと</div><p style="margin-top:6px">週刊誌系メディアが、新宿周辺で遊ぶ10代女性2人に取材。居場所がない不安や自責感から着け始めた、友人同士の仲間の印として着けている、障害はないが着けるとメリットがある、といった声を紹介しました。</p><p style="margin-top:8px"><span class="badge b-lo">確度 低</span> <span class="small muted">少人数への取材で、どれくらい広がっているかを示すデータではありません。</span></p></div>
+      <div class="card"><div class="label">あわせて話題になったこと</div><p style="margin-top:6px">訪日客が「旅行を便利にする道具」と誤解して使っているという話題や、万博時に来阪外国人へ配布したことへの批判がSNSで語られました。</p><p style="margin-top:8px"><span class="badge b-lo">確度 低</span> <span class="small muted">大阪府の配布は、障害などで配慮が必要な外国人を対象とした公式の取り組みです。</span></p></div>
+      <div class="card"><div class="label">厳格化を求める声</div><p style="margin-top:6px">Kaienのコミュニティでの簡易アンケートでは、「手帳所持者に限るなど厳格に運用すべき」が約半数。SNSでは「せめて医師の診断書を条件に」という投稿も多く共有されました。</p><p style="margin-top:8px"><span class="badge b-lo">確度 低</span> <span class="small muted">簡易アンケートは回答者が偏りやすく、世論の代表値ではありません。</span></p></div>
+      <div class="card"><div class="label">当事者への波及</div><p style="margin-top:6px">議論の前から、自治体の当事者部会では、車いす利用者が「偽物がいるのではと思われたくないので、自分は本物だと示したい」と語った例があります。疑いの空気は、本当に必要な人の行動まで変えます。</p><p style="margin-top:8px"><span class="badge b-mid">確度 中</span> <span class="small muted">三鷹市の会議資料に記録された個人の声です。</span></p></div>
+    </div>
+    <p class="small muted">過去にも、歌手のCD特典グッズのデザインがヘルプマークに酷似していると指摘され、東京都も対応を求めた結果、デザインが変更された例があります。「合図の意味が薄まること」への懸念は今回が初めてではありません。</p>
+    <p class="bridge">賛成・反対の感情がぶつかりやすいテーマです。いったん感情から離れ、どんな線引きにも必ず伴う「二つの誤り」から考えてみます。</p>
+  </div>
+</section>
+
+<!-- 6 -->
+<section class="sec" id="s6">
+  <div class="sec-head"><span class="sec-no">06 ／ 枠組み</span><h2>考えるための枠組み：二つの誤りはトレードオフ</h2></div>
+  <div class="stack">
+    <p>誰に配るかの線をどこに引いても、二種類の誤りが起きます。<strong>見逃し</strong>（本当に必要な人が使えない）と、<strong>なりすまし</strong>（必要でない人が使う）です。片方を減らすと、もう片方が増えやすい関係にあります。下のスライダーで線の厳しさを動かしてみてください。</p>
+    <div class="sim">
+      <label for="strict" class="label">線引きの厳しさ</label>
+      <input type="range" id="strict" min="0" max="2" step="1" value="0" aria-describedby="simTitle">
+      <div class="ticks"><span>自己申告のみ（現行）</span><span>自己申告＋ルール明示</span><span>手帳・診断書で限定</span></div>
+      <div class="gauges">
+        <div class="gauge"><div class="gl"><span>見逃し：必要な人が使えない</span><span id="g1t"></span></div><div class="gt"><div class="gf r" id="g1"></div></div></div>
+        <div class="gauge"><div class="gl"><span>なりすまし：必要でない人が使う</span><span id="g2t"></span></div><div class="gt"><div class="gf r" id="g2"></div></div></div>
+        <div class="gauge"><div class="gl"><span>確認の手間と費用</span><span id="g3t"></span></div><div class="gt"><div class="gf a" id="g3"></div></div></div>
+        <div class="gauge"><div class="gl"><span>本人が病名を明かす負担</span><span id="g4t"></span></div><div class="gt"><div class="gf a" id="g4"></div></div></div>
+      </div>
+      <div class="sim-out" aria-live="polite">
+        <h3 id="simTitle"></h3>
+        <p id="simText" style="margin-top:6px"></p>
+      </div>
+      <p class="small muted" style="margin-top:10px">概念図です。バーの長さは測定値ではなく、本図解による相対的な見立てです。<span class="badge b-view">本図解の見解</span></p>
+    </div>
+
+    <h3>見落とされやすい三つの点</h3>
+    <div class="grid3">
+      <div class="card"><div class="label">誰が確認するのか</div><p style="margin-top:6px">配布時に手帳を求めても、電車の中で着けている人を確かめる仕組みはありません。マーク自体は物なので、転売品や似たグッズも出回ります。配布時の厳格化が、街中のなりすましをどこまで減らせるかは不明です。</p></div>
+      <div class="card"><div class="label">手帳の外にいる人</div><p style="margin-top:6px">妊娠初期、手帳の対象にならない病気、診断前や治療中の時期、あえて手帳を取らない人。困りごとの大きさと手帳の有無は一致しません。</p></div>
+      <div class="card"><div class="label">信頼がすり減る道すじ</div><p style="margin-top:6px">一方で「何もしない」も中立ではありません。下の図のように、趣旨と違う使い方が目立つと、疑いが広がり、当事者が使わなくなる循環が起こりえます。</p></div>
+    </div>
+
+    <div class="loop-fig" role="img" aria-label="信頼がすり減る循環の図。趣旨と違う使い方が目立つ、受け手が疑う、配慮が減り当事者が使いにくくなる、合図の価値が下がる、さらに趣旨と違う使い方の比率が上がる、という循環。その循環を断つ手立てとして、受け手の行動を具体化する啓発と、何を助けてほしいかを伝える工夫が外側から矢印で入る。">
+      <svg viewBox="0 0 640 280" xmlns="http://www.w3.org/2000/svg" font-family="Noto Sans JP, sans-serif">
+        <defs><marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--rust)"/></marker>
+        <marker id="ar2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--teal)"/></marker></defs>
+        <g font-size="13" font-weight="700">
+          <rect x="190" y="14" width="200" height="44" rx="10" fill="var(--rust-soft)"/><text x="290" y="41" text-anchor="middle" fill="var(--ink)">趣旨と違う使い方が目立つ</text>
+          <rect x="400" y="116" width="200" height="44" rx="10" fill="var(--rust-soft)"/><text x="500" y="143" text-anchor="middle" fill="var(--ink)">受け手が疑い始める</text>
+          <rect x="190" y="218" width="200" height="44" rx="10" fill="var(--rust-soft)"/><text x="290" y="245" text-anchor="middle" fill="var(--ink)">当事者が使いにくくなる</text>
+          <rect x="-0" y="116" width="200" height="44" rx="10" fill="var(--rust-soft)"/><text x="100" y="143" text-anchor="middle" fill="var(--ink)">合図の価値が下がる</text>
+        </g>
+        <g stroke="var(--rust)" stroke-width="2" fill="none" marker-end="url(#ar)">
+          <path d="M390 40 Q 480 50 500 112"/>
+          <path d="M500 162 Q 480 230 394 240"/>
+          <path d="M190 240 Q 110 230 100 164"/>
+          <path d="M100 114 Q 110 50 186 40"/>
+        </g>
+        <g font-size="12" fill="var(--teal)" font-weight="700">
+          <text x="290" y="110" text-anchor="middle">断つ手立て</text>
+          <text x="290" y="130" text-anchor="middle">受け手の行動を具体的に示す</text>
+          <text x="290" y="150" text-anchor="middle">何を助けてほしいかを伝える</text>
+        </g>
+        <g stroke="var(--teal)" stroke-width="2" fill="none" stroke-dasharray="5 4" marker-end="url(#ar2)">
+          <path d="M370 124 L 396 132"/>
+          <path d="M290 158 L 290 214"/>
+        </g>
+      </svg>
+    </div>
+    <p class="small muted">この循環は本図解による仮説的な整理で、実証されたものではありません。<span class="badge b-view">本図解の見解</span> ただし、当事者調査で「役立っている」が減り「周りの反応が気になる」が上位にあることとは整合します。</p>
+    <p class="bridge">線引きはどちらに振っても誰かが困ることが見えました。そのうえで、それぞれの立場の言い分を並べます。</p>
+  </div>
+</section>
+
+<!-- 7 -->
+<section class="sec" id="s7">
+  <div class="sec-head"><span class="sec-no">07 ／ 論点</span><h2>論点の両面</h2></div>
+  <div class="stack">
+    <div class="two-side">
+      <div class="side a">
+        <h3>運用を厳しくすべきという立場</h3>
+        <ul class="clean">
+          <li>合図の信頼性を守らないと、本当に必要な人が疑われる</li>
+          <li>優先席のような限られた配慮を、必要な人に届けたい</li>
+          <li>公的なマークの趣旨が、仲間の印やアピールに置き換わるのは問題</li>
+          <li>着ける側にも、趣旨を理解したうえで使う責任がある</li>
+        </ul>
+      </div>
+      <div class="side b">
+        <h3>厳格化に慎重な立場</h3>
+        <ul class="clean">
+          <li>配慮の必要度は人によっても日によっても変わり、グラデーションである</li>
+          <li>手帳や診断の有無で区切ると、必要な人が外れる</li>
+          <li>確認の仕組みがなければ、厳格化の実効性は乏しい</li>
+          <li>入手のたびに病名を明かす負担が、利用をさらに遠ざける</li>
+        </ul>
+      </div>
+    </div>
+    <details class="acc">
+      <summary>両者がすれ違いやすい理由<span class="sum-sub">議論の焦点が「着ける人」に寄っている</span></summary>
+      <div class="body">
+        <p>厳格化の議論は「誰が着けてよいか」に集中しがちです。しかし04のデータでは、マークが働かない主な理由は受け取る側の認知や反応でした。着ける側の線引きだけを動かしても、受け手が「何をすればいいか分からない」状態は変わりません。</p>
+        <p>また、着けた若者の側に目を向けると、報道で語られた「居場所がない」「不安で自分を責める」という状態は、それ自体が支えを必要とするサインとも読めます。「誤用」とだけ捉えると、その人がつながるべき相談先への道が見えにくくなります。<span class="badge b-view">本図解の見解</span></p>
+      </div>
+    </details>
+    <details class="acc">
+      <summary>マークの「意味」はだれが決めるのか<span class="sum-sub">記号の意味は使われ方で変わる</span></summary>
+      <div class="body">
+        <p>マークの意味は作り手が決めますが、日常でどう受け取られるかは、実際の使われ方の積み重ねで変わります。仲間の印として使われる場面が増えれば、受け手にとっての意味も変わりえます。これは厳格化の根拠にもなり、同時に「啓発で意味を支え直す」根拠にもなります。</p>
+      </div>
+    </details>
+    <p class="bridge">どちらか一方に決めるのではなく、取りうる手立てを並べて比べてみます。</p>
+  </div>
+</section>
+
+<!-- 8 -->
+<section class="sec" id="s8">
+  <div class="sec-head"><span class="sec-no">08 ／ 選択肢</span><h2>選択肢のメニュー</h2></div>
+  <div class="stack">
+    <p>どの手立ても、効果を検証した研究はほとんど見当たりません。下は「仕組みから考えて期待できること」と「懸念」の整理です。組み合わせて使うことも可能です。</p>
+
+    <details class="acc"><summary>A　現行の自己申告を保ち、受け手への啓発を強める<span class="sum-sub">「見かけたら何をするか」を具体的に伝える</span></summary>
+      <div class="body"><div class="pc"><div class="pro"><span class="label">期待できること</span>見逃しを増やさない。03・04で見た「対応が分からない」に直接働きかける。</div><div class="con"><span class="label">懸念</span>なりすましへの不信は残る。啓発の効果は時間がかかり、測りにくい。</div></div><p class="small muted">例：東京都の「ヘルプマークの日」でのSNS・デジタルサイネージ活用 <span class="badge b-hi">確度 高</span>（取り組みの存在について）</p></div></details>
+
+    <details class="acc"><summary>B　自己申告は保ち、使い方のルールを明文化する<span class="sum-sub">配布時に趣旨と注意を明確に伝える</span></summary>
+      <div class="body"><div class="pc"><div class="pro"><span class="label">期待できること</span>線引きを変えずに「趣旨に沿って使う」という共通認識を作れる。</div><div class="con"><span class="label">懸念</span>強制力はない。文面次第では、境界にいる当事者を萎縮させる。</div></div><p class="small muted">例：三重県は利用者向け案内で「配慮が必要でない方が過剰な配慮を求めて使うことのないよう」と記載。横浜市は転売などの不正な流用をしないよう明記。<span class="badge b-hi">確度 高</span></p></div></details>
+
+    <details class="acc"><summary>C　「何を助けてほしいか」を伝える工夫を足す<span class="sum-sub">ヘルプカード・ヘルプシールとの併用</span></summary>
+      <div class="body"><div class="pc"><div class="pro"><span class="label">期待できること</span>援助の5段階のうち、マークが弱い段階4（どう助けるか）を補える。</div><div class="con"><span class="label">懸念</span>書く内容によっては個人情報の露出が増える。記入は任意であることが大前提。</div></div><p class="small muted">例：葛飾区は「外見からは分からない障害があります」などのヘルプシールを配布し、ヘルプマークと併用できるようにしている。<span class="badge b-hi">確度 高</span></p></div></details>
+
+    <details class="acc"><summary>D　合図の向きを逆にする<span class="sum-sub">助ける側が「支援します」と示す</span></summary>
+      <div class="body"><div class="pc"><div class="pro"><span class="label">期待できること</span>助けを求める人が名乗り出なくてよい。段階3（自分が引き受ける）を助ける側の意思表示で越えられる。</div><div class="con"><span class="label">懸念</span>着ける人が十分にいないと機能しない。効果の検証はこれから。</div></div><p class="small muted">例：東京都と東京都立大学の共同研究で、2024年11月のイベントにて「支援しますマーク」を協力者25人が着ける実証を実施。着けた側から「声をかけやすくなった」などの感想が報告された（中間報告）。<span class="badge b-lo">確度 低</span></p></div></details>
+
+    <details class="acc"><summary>E　配布の場で短い対話をする<span class="sum-sub">確認ではなく、使い方の説明と困りごとの聞き取り</span></summary>
+      <div class="body"><div class="pc"><div class="pro"><span class="label">期待できること</span>線は引かずに趣旨を伝えられる。不安を抱えた若者などを相談先につなぐ入口にもなりうる。</div><div class="con"><span class="label">懸念</span>駅務室などでは人手と時間が足りない。対話が「審査」に変わると、利用をためらわせる。</div></div><p class="small muted"><span class="badge b-view">本図解の見解</span> 実施例は確認できていません。</p></div></details>
+
+    <details class="acc"><summary>F　手帳や診断書で配布対象を限る<span class="sum-sub">厳格化</span></summary>
+      <div class="body"><div class="pc"><div class="pro"><span class="label">期待できること</span>配布の段階では、趣旨と違う入手を減らせる。「誰でももらえる」という不信に応えられる。</div><div class="con"><span class="label">懸念</span>06で見たとおり見逃しが大きく増える。診断書の費用と、病名を明かす負担が生じる。配布後の利用や類似品は確認できない。</div></div><p class="small muted">一部の自治体では、以前から申請や確認を求める運用があったと報じられています。<span class="badge b-mid">確度 中</span></p></div></details>
+    <p class="bridge">ここまでの整理を踏まえて、出発点になったKaienの記事を読み直します。</p>
+  </div>
+</section>
+
+<!-- 9 -->
+<section class="sec" id="s9">
+  <div class="sec-head"><span class="sec-no">09 ／ 検討</span><h2>記事をどう読むか</h2></div>
+  <div class="stack">
+    <div class="card">
+      <div class="label">記事の主張（要約）</div>
+      <ul class="clean" style="margin-top:8px">
+        <li>趣旨と違う利用に厳格化を求める気持ちは理解できるが、運用を狭めることには懸念がある</li>
+        <li>配慮の必要度は、診断や手帳の有無にかかわらず、特性やその日の体調でグラデーションのように変わる</li>
+        <li>マークの有無で人を二分するのではなく、誰もが「助けて」と言え、周りが自然に受け入れる空気を作ることが本質</li>
+        <li>職場の合理的配慮も同じで、制度や記号よりも、困りごとを開示しやすい心理的安全性が出発点</li>
+      </ul>
+      <p class="small muted" style="margin-top:8px">株式会社Kaien「お悩み解決ルーム」2026年4月30日配信の再構成記事（7月11日公開）</p>
+    </div>
+    <div class="two-side">
+      <div class="side b"><h3>支持できる点</h3><ul class="clean">
+        <li>必要度をグラデーションとして捉える視点は、手帳の外にいる人を見落とさないために重要</li>
+        <li>「見かけても理由を詮索しない」という行動提案は具体的で、すぐ実践できる</li>
+        <li>マークよりも、助けを求めやすい関係や環境に目を向ける方向性は、04のデータとも合う</li>
+      </ul></div>
+      <div class="side a"><h3>補いたい点</h3><ul class="clean">
+        <li>確認しない合図は、趣旨外の利用が増えると信頼がすり減るという仕組み上の弱点に触れていない</li>
+        <li>「空気感の醸成」は方向としては正しいが、何をすれば空気が変わるのかという道すじがない</li>
+        <li>引用された簡易アンケートは回答者が偏りやすく、世論の分布としては読めない</li>
+        <li>着ける若者の孤立や不安を、支援につなぐべきニーズとして扱う視点が薄い</li>
+      </ul></div>
+    </div>
+    <details class="acc">
+      <summary>合理的配慮との関係を正確に押さえる<span class="sum-sub">マークを着けることは、配慮の申し出そのものではない</span></summary>
+      <div class="body">
+        <p>記事は「すべての現場で合理的配慮の提供が義務づけられている」と説明しています。雇用の分野では障害者雇用促進法で、それ以外の分野では2024年4月施行の改正障害者差別解消法で、民間の事業者にも提供が義務づけられました。この点は大筋で正確です。<span class="badge b-hi">確度 高</span></p>
+        <p>ただし、合理的配慮は本人からの意思の表明を受けて、事業者と本人が話し合い（建設的対話）、過重な負担にならない範囲で調整するものです。街中で見知らぬ人に向けたヘルプマークは、こうした個別の申し出や話し合いの代わりにはなりません。職場では、マークよりも「何に困り、何を調整してほしいか」を具体的に伝えることが中心になります。</p>
+      </div>
+    </details>
+    <p class="bridge">最後に、就労支援の現場でこの議論をどう生かすかを考えます。</p>
+  </div>
+</section>
+
+<!-- 10 -->
+<section class="sec" id="s10">
+  <div class="sec-head"><span class="sec-no">10 ／ 現場</span><h2>就労支援の現場で考えること</h2></div>
+  <div class="stack">
+    <p>利用者さんがヘルプマークについて相談してきたとき、支援者の役割は「着けてよいかを判断すること」ではありません。マークは自己申告の仕組みなので、判断する権限も根拠も支援者にはありません。役割は、本人が自分の困りごとと伝え方を選べるように一緒に考えることです。<span class="badge b-view">本図解の見解</span></p>
+
+    <details class="acc"><summary>場面1　「ヘルプマークを付けてもいいですか」と聞かれた</summary>
+      <div class="body">
+        <ul class="clean">
+          <li>可否ではなく、「どんな場面で、誰に、何をしてもらえると助かるか」を一緒に言葉にする</li>
+          <li>メリット（席を譲られやすい、緊急時に気づいてもらえる）と、気になる点（周りの反応、目立つことへの不安）を本人と並べる</li>
+          <li>付けたあとに起きうる場面（譲られる、譲られない、声をかけられる）への対応を練習しておく</li>
+          <li>裏面シールに書く内容は任意で、知られたくないことは書かなくてよいと伝える</li>
+        </ul>
+      </div></details>
+
+    <details class="acc"><summary>場面2　職場でも付けたいと言われた</summary>
+      <div class="body">
+        <ul class="clean">
+          <li>ヘルプマークは主に見知らぬ人向けの合図。職場では、具体的な配慮の申し出と話し合いが中心になる</li>
+          <li>開示するかどうか、どこまで開示するかは本人が選ぶ。マークを着けると、意図せず同僚に知られる可能性もある</li>
+          <li>自己紹介シートやナビゲーションブックなど、「何に困り、何があれば働きやすいか」を伝える資料と組み合わせて考える</li>
+        </ul>
+      </div></details>
+
+    <details class="acc"><summary>場面3　SNSの議論を見て不安になっている</summary>
+      <div class="body">
+        <ul class="clean">
+          <li>「自分は付けていいのか」「偽物と思われないか」という不安は、05で見たとおり実際に起きている反応</li>
+          <li>マークは手帳の有無で配られているものではなく、必要だと感じた人が使う仕組みであることを、公式の説明に沿って伝える</li>
+          <li>不安が強く外出や通所に影響している場合は、その不安自体をテーマとして扱う</li>
+        </ul>
+      </div></details>
+
+    <details class="acc"><summary>場面4　スタッフ自身が「あの人は本当に必要なのか」と感じた</summary>
+      <div class="body">
+        <ul class="clean">
+          <li>外から見て必要度を判断する材料は、ほぼありません。それがこのマークの前提です</li>
+          <li>判断を保留し、「何か事情があるのかもしれない」と考える。これは利用者さんへの姿勢とも同じです</li>
+        </ul>
+      </div></details>
+
+    <div class="role">
+      <div><div class="label" style="color:var(--teal)">スタッフができること</div><ul class="clean" style="margin-top:8px">
+        <li>困りごとと伝え方の言語化を手伝う</li>
+        <li>マーク・ヘルプカード・職場での申し出の違いを説明する</li>
+        <li>通勤練習などで場面を想定した練習をする</li>
+        <li>公式情報（配布場所・使い方）を一緒に確認する</li>
+      </ul></div>
+      <div class="refer"><div class="label" style="color:var(--rust)">専門職や外部につなぐこと</div><ul class="clean" style="margin-top:8px">
+        <li>体調や症状の変化、パニック発作の増加など医学的な判断が要ること → 主治医</li>
+        <li>外出中に嫌がらせや被害にあった、強い恐怖が続く → 被害の相談窓口や警察、主治医と連携</li>
+        <li>職場での配慮の調整 → 職場の担当者・定着支援と連携した建設的対話</li>
+      </ul></div>
+    </div>
+
+    <div class="card">
+      <h3>朝礼・ケース検討で話し合うための問い</h3>
+      <ol class="qlist" style="margin-top:12px">
+        <li>手帳を持たない利用者さんがマークを使いたいと言ったとき、私たちはどんな言葉を返しているか</li>
+        <li>「見えない困難」を説明するとき、私たちは病名に頼りすぎていないか。困りごとと必要な手助けで説明できるか</li>
+        <li>着ける若者を「誤用」と呼ぶ前に、その人に必要な支えは何かを考えられているか</li>
+        <li>合図に頼らず「助けて」と言える関係を、事業所の中でどう作っているか</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- 11 -->
+<section class="sec" id="s11">
+  <div class="sec-head"><span class="sec-no">11 ／ 行動</span><h2>見かけたとき・持つとき</h2></div>
+  <div class="stack">
+    <div class="action">
+      <div class="card"><div class="ico-row"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--teal)"><path d="M5 20V10a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v4h3a1 1 0 0 1 1 1v5"/><path d="M5 16h14"/><circle cx="10" cy="4" r="1.8"/></svg><div><h3>電車・バスでは席を譲る</h3><p class="small" style="margin-top:4px">外見は元気でも、疲れやすい、同じ姿勢を保てないことがあります。</p></div></div></div>
+      <div class="card"><div class="ico-row"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--teal)"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg><div><h3>困っていそうなら声をかける</h3><p class="small" style="margin-top:4px">「何かお手伝いできることはありますか」と尋ね、断られたらそのまま引きます。</p></div></div></div>
+      <div class="card"><div class="ico-row"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--teal)"><path d="M12 3l9 16H3z"/><path d="M12 10v4M12 17v.5"/></svg><div><h3>災害時は避難を手伝う</h3><p class="small" style="margin-top:4px">状況の把握や素早い移動が難しい人がいます。</p></div></div></div>
+      <div class="card"><div class="ico-row"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--teal)"><circle cx="11" cy="11" r="7"/><path d="M21 21l-5-5M8 11h6"/></svg><div><h3>理由は詮索しない</h3><p class="small" style="margin-top:4px">マークは病名を説明しなくてよい仕組みです。事情を聞き出さないことも配慮です。</p></div></div></div>
+    </div>
+    <p class="small muted">上の三つは東京都などが呼びかけている行動、四つ目は記事の提案です。<span class="badge b-hi">確度 高</span></p>
+    <div class="callout"><strong>持つ人向けの注意（自治体の案内から）</strong>　ストラップがドアに挟まれないようにする。裏面シールに知られたくないことは書かない。悪用を防ぐため、紛失や置き忘れに気をつける。</div>
+  </div>
+</section>
+
+<!-- sources -->
+<section class="sec sources" id="src">
+  <div class="sec-head"><span class="sec-no">情報ソース</span><h2>情報ソース</h2></div>
+  <div class="stack">
+    <ol>
+      <li><a href="https://www.kaien-lab.com/useful/8-others/onayami-260430-1/" target="_blank" rel="noopener">株式会社Kaien「ヘルプマークの『カジュアル化』が問いかけるもの」（2026年7月11日公開）</a></li>
+      <li><a href="https://www.fukushi.metro.tokyo.lg.jp/shougai/shougai_shisaku/helpmark" target="_blank" rel="noopener">東京都福祉局「ヘルプマーク」</a></li>
+      <li><a href="https://www.fukushi.metro.tokyo.lg.jp/documents/d/fukushi/guideline6_050701" target="_blank" rel="noopener">東京都福祉局「ヘルプマーク作成・活用ガイドライン」Ver.6（2023年7月）</a></li>
+      <li><a href="https://www.metro.tokyo.lg.jp/information/press/2025/05/2025051604" target="_blank" rel="noopener">東京都報道発表「7月20日を『ヘルプマークの日』に制定」（2025年5月）</a></li>
+      <li><a href="https://www.fukushi.metro.tokyo.lg.jp/documents/d/fukushi/07-15_siryou15" target="_blank" rel="noopener">東京都福祉局 会議資料「ヘルプマークについて」（累計配布数の記載）</a></li>
+      <li><a href="https://www.fukushi.metro.tokyo.lg.jp/documents/d/fukushi/kyouseishakai_chukannhoukoku" target="_blank" rel="noopener">東京都「共生社会の実現に向けた都立大との共同研究（中間報告）」</a></li>
+      <li><a href="https://www.2020games.metro.tokyo.lg.jp/multilingual/council/pdf/meeting_07/reference06.pdf" target="_blank" rel="noopener">経済産業省「JIS Z8210（案内用図記号）の改正について」（2018年1月）</a></li>
+      <li><a href="https://www.city.yokohama.lg.jp/kurashi/fukushi-kaigo/fukushi/kenkofukushi-joho/helpmark.html" target="_blank" rel="noopener">横浜市「ヘルプマーク」（配布条件）</a></li>
+      <li><a href="https://www.pref.saitama.lg.jp/a0604/helpmark.html" target="_blank" rel="noopener">埼玉県「ヘルプマークを知っていますか」</a></li>
+      <li><a href="https://www.pref.yamanashi.jp/shogai-fks/helpmark.html" target="_blank" rel="noopener">山梨県「ヘルプマークを知っていますか」（内部障害の説明）</a></li>
+      <li><a href="https://www.pref.mie.lg.jp/common/content/001176394.pdf" target="_blank" rel="noopener">三重県「ヘルプマークを使用される方へ」</a></li>
+      <li><a href="https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/251/herupusi-rugoannnai.pdf" target="_blank" rel="noopener">葛飾区「ヘルプシールのごあんない」</a></li>
+      <li><a href="https://osaka-info.jp/special/universal/%e3%80%90%e5%a4%a7%e9%98%aa%e5%ba%9c%e3%80%91%e2%98%854-13%ef%bd%9e%e9%85%8d%e5%b8%83%e9%96%8b%e5%a7%8b%e3%81%84%e3%81%9f%e3%81%97%e3%81%be%e3%81%97%e3%81%9f%ef%bc%81%e2%98%85%e6%9d%a5%e9%98%aa/" target="_blank" rel="noopener">大阪観光局「来阪外国人向けヘルプマークの配布」</a></li>
+      <li><a href="https://www.dlri.co.jp/files/ld/300356.pdf" target="_blank" rel="noopener">第一生命経済研究所 水野映子「助け合いを促すヘルプマーク」（2023年12月、内閣府2022年調査の数値を掲載）</a></li>
+      <li><a href="https://origin.digitalpr.jp/pdf.php?r=53438" target="_blank" rel="noopener">ゼネラルパートナーズ「ヘルプマークの認知度・利用状況調査」（2021年11月）</a></li>
+      <li><a href="https://www.pref.ibaraki.jp/bugai/koho/kocho/netmonitor/kekka/documents/kekka6-5.pdf" target="_blank" rel="noopener">茨城県ネットモニターアンケート結果（ヘルプマークの認知と対応）</a></li>
+      <li><a href="https://www.city.mitaka.lg.jp/c_shimin_kaigiroku/111/attached/attach_111647_5.pdf" target="_blank" rel="noopener">三鷹市 会議資料（当事者部会の回答）</a></li>
+      <li><a href="https://toyokeizai.net/articles/-/214462" target="_blank" rel="noopener">東洋経済オンライン（週刊女性PRIME提供）「ヘルプマークを知っていますか?」（誕生の経緯）</a></li>
+      <li><a href="https://friday.kodansha.co.jp/article/466045" target="_blank" rel="noopener">FRIDAYデジタル「ファッション感覚で『ヘルプマーク』を付ける若者たち」（2026年4月）</a></li>
+      <li><a href="https://www.tokyo-sports.co.jp/articles/-/242154" target="_blank" rel="noopener">東京スポーツ（類似グッズをめぐる報道）</a></li>
+      <li><a href="https://www.swissinfo.ch/jpn/business/-/48009566" target="_blank" rel="noopener">swissinfo.ch（類似グッズのデザイン変更とマークをめぐる議論）</a></li>
+      <li><a href="https://www.jprime.jp/articles/-/12026" target="_blank" rel="noopener">週刊女性PRIME（2018年時点の配布状況と自治体ごとの運用の違い）</a></li>
+      <li><a href="https://www.cao.go.jp/press/new_wave/20240520.html" target="_blank" rel="noopener">内閣府「障害者差別解消法」改正（合理的配慮の提供義務化）</a></li>
+      <li>理論：Latané, B., &amp; Darley, J. M. (1970). <i>The Unresponsive Bystander: Why Doesn't He Help?</i> Appleton-Century-Crofts.</li>
+      <li>理論：Spence, M. (1973). Job Market Signaling. <i>The Quarterly Journal of Economics</i>, 87(3), 355–374. <a href="https://doi.org/10.2307/1882010" target="_blank" rel="noopener">doi:10.2307/1882010</a></li>
+    </ol>
+    <p class="small muted">03・06のヘルプマークへの理論の当てはめ、06の循環図、08の各選択肢の見立ては、上記資料をもとにした本図解の整理です。</p>
+  </div>
+</section>
+</main>
+
+<footer>岡村雄一郎</footer>
+
+<script>
+(function(){
+  // progress & toc
+  var bar=document.getElementById('bar');
+  function onScroll(){var h=document.documentElement;var max=h.scrollHeight-h.clientHeight;bar.style.width=(max>0?(h.scrollTop/max*100):0)+'%';}
+  window.addEventListener('scroll',onScroll,{passive:true});onScroll();
+  var tocBtn=document.getElementById('tocBtn'),toc=document.getElementById('toc');
+  tocBtn.addEventListener('click',function(e){e.stopPropagation();toc.hidden=!toc.hidden;tocBtn.setAttribute('aria-expanded',String(!toc.hidden));});
+  document.addEventListener('click',function(e){if(!toc.hidden&&!toc.contains(e.target)){toc.hidden=true;tocBtn.setAttribute('aria-expanded','false');}});
+  function scrollToSection(id){var el=document.getElementById(id);if(el){el.scrollIntoView({behavior:'smooth',block:'start'});}}
+  toc.querySelectorAll('button[data-target]').forEach(function(b){b.addEventListener('click',function(){toc.hidden=true;tocBtn.setAttribute('aria-expanded','false');scrollToSection(b.getAttribute('data-target'));});});
+
+  // steps
+  var stepData=[
+    {t:'段階1　気づく',e:'強い',d:'赤いタグは目に入りやすく、周りの注意を引きます。マークがなければ、外見から分からない困難にはそもそも気づけません。ヘルプマークがいちばん強く働く段階です。'},
+    {t:'段階2　助けが要る状況だと解釈する',e:'強い',d:'「この人は配慮が要るかもしれない」と解釈するきっかけを与えます。ただし、意味を知らない人には働きません。内閣府2022年調査の認知率は52.3%で、年代や地域で大きな差があります。'},
+    {t:'段階3　自分が動くと引き受ける',e:'弱い',d:'周りに人が多いほど「誰かがやるだろう」と思い、動きにくくなることが知られています（傍観者効果）。マークは状況を伝えますが、「あなたが動いて」とまでは伝えません。'},
+    {t:'段階4　どう助けるか分かる',e:'弱い',d:'マークは「何をしてほしいか」を伝えません。席を譲ればよいのか、声をかけるべきか、そっとしておくべきかは、見る人には分かりません。裏面シールやヘルプカードで補う余地がある段階です。'},
+    {t:'段階5　実際に行動する',e:'ほぼなし',d:'声をかけて断られたら気まずい、間違っていたら失礼、といったためらいはマークでは解消されません。ここを支えるのは「見かけたらこうする」という社会の共通認識です。'}
+  ];
+  var steps=document.querySelectorAll('.step'),detail=document.getElementById('stepDetail');
+  function showStep(i){steps.forEach(function(s,k){s.setAttribute('aria-pressed',String(k===i));});var s=stepData[i];detail.innerHTML='<div class="label">マークの効き目：'+s.e+'</div><h3 style="margin-top:4px">'+s.t+'</h3><p style="margin-top:6px">'+s.d+'</p>';}
+  steps.forEach(function(s,i){s.addEventListener('click',function(){showStep(i);});});showStep(0);
+
+  // chart
+  var age=[['全体',52.3,1],['18〜29歳',75.7],['30〜39歳',67.4],['40〜49歳',57.8],['50〜59歳',60.7],['60〜69歳',50.3],['70歳以上',32.8]];
+  var city=[['全体',52.3,1],['東京都区部',83.6],['政令指定都市',62.3],['中都市',52.1],['小都市',36.9],['町村',40.3]];
+  var barsEl=document.getElementById('bars');
+  function render(el,data,unit){el.innerHTML=data.map(function(r){return '<div class="bar'+(r[2]?' total':'')+'"><span>'+r[0]+'</span><div class="track"><div class="fill" style="width:'+r[1]+'%"></div></div><span class="v">'+r[1]+(unit||'%')+'</span></div>';}).join('');}
+  var segA=document.getElementById('segAge'),segC=document.getElementById('segCity');
+  segA.addEventListener('click',function(){segA.setAttribute('aria-pressed','true');segC.setAttribute('aria-pressed','false');render(barsEl,age);});
+  segC.addEventListener('click',function(){segC.setAttribute('aria-pressed','true');segA.setAttribute('aria-pressed','false');render(barsEl,city);});
+  render(barsEl,age);
+  render(document.getElementById('reasons'),[['利用する場所や機会がない',36],['周りの反応が気になる',30],['認知不足で役に立たない',29],['入手方法が分からない',19],['嫌がらせの噂を聞いた',14],['地域で導入されていない',8]]);
+  document.querySelectorAll('#reasons .bar').forEach(function(b){b.style.gridTemplateColumns='minmax(0,11em) 1fr 3em';});
+
+  // slider
+  var levels=[
+    {v:[15,70,10,10],l:['小','大','小','小'],t:'自己申告のみ（現行）',x:'必要だと感じた人は誰でも受け取れるため、見逃しはもっとも少なくなります。その代わり、趣旨と違う使い方も防げず、合図の信頼は使う人と見る人の良識に支えられます。'},
+    {v:[30,50,20,15],l:['小〜中','中','小','小'],t:'自己申告＋使い方のルール明示',x:'線は変えずに、配布時や案内で趣旨と注意をはっきり伝えます。強制力はないものの、共通認識を作る効果が期待されます。文面が厳しすぎると、境界にいる当事者がためらうおそれがあります。'},
+    {v:[80,30,75,85],l:['大','中','大','大'],t:'手帳・診断書で限定',x:'配布段階での趣旨外の入手は減ります。一方で、妊娠初期、手帳の対象外の病気、診断前や一時的な困難の人が外れます。診断書の費用や、病名を窓口で明かす負担も生じます。街中での利用や類似品は確認できないため、なりすましは残ります。'}
+  ];
+  var sl=document.getElementById('strict');
+  function upd(){var L=levels[+sl.value];for(var i=0;i<4;i++){document.getElementById('g'+(i+1)).style.width=L.v[i]+'%';document.getElementById('g'+(i+1)+'t').textContent=L.l[i];}document.getElementById('simTitle').textContent=L.t;document.getElementById('simText').textContent=L.x;sl.setAttribute('aria-valuetext',L.t);}
+  sl.addEventListener('input',upd);upd();
+
+  // gentle rise (content visible at rest)
+  if('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: reduce)').matches){
+    var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('rise');io.unobserve(e.target);}});},{rootMargin:'0px 0px -10% 0px'});
+    document.querySelectorAll('.sec-head,.card,.callout,.side,.loop-fig,.sim').forEach(function(el){var r=el.getBoundingClientRect();if(r.top>innerHeight)io.observe(el);});
+  }
+})();
+</script>
+
+</body></html>
